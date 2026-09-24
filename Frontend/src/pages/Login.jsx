@@ -58,7 +58,9 @@ const Login = () => {
         setError(
           error.response?.data
             ?.message ||
-            "Login failed"
+            (error.code === "ERR_NETWORK"
+              ? "Cannot reach the server. Start the backend and try again."
+              : "Login failed")
         );
       } finally {
         setLoading(false);

@@ -66,7 +66,8 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(401).json({

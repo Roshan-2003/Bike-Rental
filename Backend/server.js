@@ -11,10 +11,14 @@ import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
+const currentFile = fileURLToPath(import.meta.url);
+const currentDirectory = path.dirname(currentFile);
 
 app.use(
   cors({
@@ -24,6 +28,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/uploads", express.static(path.join(currentDirectory, "uploads")));
 
 app.use((error, req, res, next) => {
   if (error instanceof SyntaxError && error.status === 400 && "body" in error) {

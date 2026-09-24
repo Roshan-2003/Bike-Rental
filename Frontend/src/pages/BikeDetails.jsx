@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   CalendarDays,
-  CheckCircle,
   Fuel,
   Heart,
   MapPin,
@@ -25,6 +24,11 @@ const BikeDetails = () => {
   const [endDate, setEndDate] = useState("");
 
   const [error, setError] = useState("");
+
+  const today = new Date();
+  const minimumDate = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   useEffect(() => {
     const fetchBike = async () => {
@@ -291,6 +295,7 @@ const BikeDetails = () => {
                     <input
                       type="date"
                       value={startDate}
+                      min={minimumDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />
@@ -311,6 +316,7 @@ const BikeDetails = () => {
                     <input
                       type="date"
                       value={endDate}
+                      min={startDate || minimumDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       className="w-full rounded-xl border border-slate-200 py-3 pl-10 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     />

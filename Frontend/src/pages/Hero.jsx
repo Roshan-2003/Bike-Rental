@@ -1,6 +1,19 @@
-import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  CheckCircle2,
+  MapPin,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 
 function Hero() {
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    navigate("/bikes");
+  };
+
   return (
     <div className="overflow-hidden">
       <section className="relative min-h-[600px] overflow-hidden bg-slate-950 sm:min-h-[640px] lg:min-h-[680px]">
@@ -165,5 +178,21 @@ function Hero() {
     </div>
   );
 }
+
+const TrustItem = ({ text }) => (
+  <div className="flex items-center gap-2">
+    <CheckCircle2 size={16} className="text-green-400" />
+    <span>{text}</span>
+  </div>
+);
+
+const Stat = ({ value, label }) => (
+  <div className="border-b border-r border-slate-100 p-4 text-center last:border-r-0 sm:p-6 lg:border-b-0 lg:p-7 lg:[&:nth-child(2)]:border-r">
+    <p className="text-xl font-black text-slate-900 sm:text-2xl lg:text-3xl">
+      {value}
+    </p>
+    <p className="mt-1 text-xs text-slate-500 sm:text-sm">{label}</p>
+  </div>
+);
 
 export default Hero;

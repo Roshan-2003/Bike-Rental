@@ -1,27 +1,50 @@
 import express from "express";
+import {
+  getDashboardStats,
+  getAllBookings,
+  getAdminBookingById,
+  updateBookingStatus,
+  getAllUsers,
+  getAdminUserById,
+  getAllCoupons,
+  createCoupon,
+  updateCoupon,
+  deleteCoupon,
+  toggleCouponStatus,
+  getAdminReports,
+} from "../controllers/admin.controller.js";
 
 import protect from "../middleware/auth.middleware.js";
 import adminOnly from "../middleware/admin.middleware.js";
-
-import {
-  getDashboardStats,
-  getAllUsers,
-  updateUserRole,
-  deleteUser,
-} from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
 // Dashboard
 router.get("/dashboard", protect, adminOnly, getDashboardStats);
 
-// Get all users
+// Users
 router.get("/users", protect, adminOnly, getAllUsers);
 
-// Change user role
-router.put("/users/:id/role", protect, adminOnly, updateUserRole);
+router.get("/users/:id", protect, adminOnly, getAdminUserById);
 
-// Delete user
-router.delete("/users/:id", protect, adminOnly, deleteUser);
+// Coupons
+router.get("/coupons", protect, adminOnly, getAllCoupons);
+
+router.post("/coupons", protect, adminOnly, createCoupon);
+
+router.put("/coupons/:id", protect, adminOnly, updateCoupon);
+
+router.delete("/coupons/:id", protect, adminOnly, deleteCoupon);
+
+router.put("/coupons/:id/toggle", protect, adminOnly, toggleCouponStatus);
+
+// Bookings
+router.get("/bookings", protect, adminOnly, getAllBookings);
+
+router.get("/bookings/:id", protect, adminOnly, getAdminBookingById);
+
+router.put("/bookings/:id/status", protect, adminOnly, updateBookingStatus);
+
+router.get("/reports", protect, adminOnly, getAdminReports);
 
 export default router;

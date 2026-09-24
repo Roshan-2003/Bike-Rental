@@ -11,7 +11,7 @@ const createAdmin = async () => {
     await mongoose.connect(process.env.MONGO_URI);
 
     const existingAdmin = await User.findOne({
-      email: "admin@bikerental.com",
+      email: "admin@gmail.com",
     });
 
     if (existingAdmin) {
@@ -26,7 +26,7 @@ const createAdmin = async () => {
 
     const admin = await User.create({
       name: "Bike Rental Admin",
-      email: "admin@bikerental.com",
+      email: "admin@gmail.com",
       password: hashedPassword,
       phone: "9999999999",
       role: "admin",

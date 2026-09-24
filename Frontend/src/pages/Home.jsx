@@ -14,10 +14,30 @@ import {
 } from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
+import { getBikes } from "../services/bike.service";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [bikes, setBikes] = useState([]);
+  const [bikesLoading, setBikesLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBikes = async () => {
+      try {
+        const response = await getBikes();
+        setBikes(
+          (response.bikes || []).filter((bike) => bike.available).slice(0, 3),
+        );
+      } catch (error) {
+        console.error("Failed to load bikes for home page:", error);
+      } finally {
+        setBikesLoading(false);
+      }
+    };
+
+    fetchBikes();
+  }, []);
 
   const handleSearch = () => {
     navigate("/bikes");
@@ -209,29 +229,26 @@ const Home = () => {
           />
 
           <div className="mt-10 grid gap-5 sm:mt-12 sm:gap-6 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
-            <BikePreview
-              image="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80"
-              name="Urban Cruiser"
-              type="Cruiser"
-              price="₹899"
-              rating="4.9"
-            />
-
-            <BikePreview
-              image="https://images.unsplash.com/photo-1558981285-6f0c94958bb6?auto=format&fit=crop&w=900&q=80"
-              name="Street Rider"
-              type="Sports"
-              price="₹1,199"
-              rating="4.8"
-            />
-
-            <BikePreview
-              image="https://images.unsplash.com/photo-1525160354320-d8e92641c563?auto=format&fit=crop&w=900&q=80"
-              name="City Explorer"
-              type="Commuter"
-              price="₹699"
-              rating="4.9"
-            />
+            {bikesLoading ? (
+              <p className="text-center text-slate-500 md:col-span-2 lg:col-span-3">
+                Loading bikes...
+              </p>
+            ) : bikes.length ? (
+              bikes.map((bike) => (
+                <BikePreview
+                  key={bike._id}
+                  id={bike._id}
+                  image={bike.image}
+                  name={bike.name}
+                  type={bike.type}
+                  price={bike.pricePerDay}
+                />
+              ))
+            ) : (
+              <p className="text-center text-slate-500 md:col-span-2 lg:col-span-3">
+                No bikes are currently available.
+              </p>
+            )}
           </div>
 
           <div className="mt-8 text-center sm:mt-10">
@@ -584,9 +601,12 @@ const SectionHeader = ({ eyebrow, title, description, dark = false }) => (
       dark ? "text-white" : "text-slate-900"
     }`}
   >
-    <h2 className="mt-3 text-3xl font-bold sm:text-4xl lg:text-5xl">
-      {title}
-    </h2>
+    {eyebrow && (
+      <p className="text-xs font-bold uppercase tracking-widest text-blue-600 sm:text-sm">
+        {eyebrow}
+      </p>
+    )}
+    <h2 className="mt-3 text-3xl font-bold sm:text-4xl lg:text-5xl">{title}</h2>
 
     <p
       className={`mt-3 text-sm leading-6 sm:mt-4 sm:text-base sm:leading-7 ${
@@ -598,23 +618,20 @@ const SectionHeader = ({ eyebrow, title, description, dark = false }) => (
   </div>
 );
 
-const BikePreview = ({ image, name, type, price, rating }) => (
+const BikePreview = ({ id, image, name, type, price }) => (
   <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl">
     <div className="relative overflow-hidden">
       <img
-        src={image}
+        src={
+          image ||
+          "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80"
+        }
         alt={name}
         className="h-52 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-56 lg:h-64"
       />
 
       <div className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-bold sm:left-4 sm:top-4 sm:px-3">
         {type}
-      </div>
-
-      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-bold sm:right-4 sm:top-4 sm:px-3">
-        <Star size={13} className="fill-yellow-400 text-yellow-400" />
-
-        {rating}
       </div>
     </div>
 
@@ -629,13 +646,13 @@ const BikePreview = ({ image, name, type, price, rating }) => (
         </h3>
 
         <p className="font-black text-blue-600">
-          {price}
+          ₹{Number(price).toLocaleString("en-IN")}
           <span className="text-xs font-medium text-slate-400">/day</span>
         </p>
       </div>
 
       <Link
-        to="/bikes"
+        to={`/bikes/${id}`}
         className="mt-4 flex items-center justify-center gap-2 rounded-xl  py-2.5 text-sm font-bold text-white transition bg-blue-600 sm:mt-5 sm:py-3 sm:text-base"
       >
         View Bike

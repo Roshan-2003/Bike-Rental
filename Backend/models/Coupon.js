@@ -25,11 +25,13 @@ const couponSchema = new mongoose.Schema(
     minBookingAmount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     maxDiscount: {
       type: Number,
-      default: null,
+      default: 0,
+      min: 0,
     },
 
     expiryDate: {
@@ -39,12 +41,14 @@ const couponSchema = new mongoose.Schema(
 
     usageLimit: {
       type: Number,
-      default: null,
+      default: 0,
+      min: 0,
     },
 
     usedCount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     active: {
@@ -54,7 +58,7 @@ const couponSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Coupon = mongoose.model("Coupon", couponSchema);

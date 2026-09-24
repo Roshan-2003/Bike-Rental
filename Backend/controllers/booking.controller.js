@@ -11,6 +11,8 @@ const parseBookingDate = (value) => {
   return new Date(value);
 };
 
+const getUtcDateKey = (date) => date.toISOString().slice(0, 10);
+
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -55,10 +57,13 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const todayKey = getUtcDateKey(new Date());
+    const startDateKey =
+      typeof startDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(startDate)
+        ? startDate
+        : getUtcDateKey(start);
 
-    if (start < today) {
+    if (startDateKey < todayKey) {
       return res.status(400).json({
         success: false,
         message: "Start date cannot be in the past",
@@ -72,19 +77,19 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    const existingBooking =
-      await Booking.findOne({
-        bike: bikeId,
-        status: {
-          $in: [
-            "pending",
-            "confirmed",
-            "active",
-          ],
-        },
-        startDate: { $lt: end },
-        endDate: { $gt: start },
-      });
+    const pendingBookingCutoff = new Date(
+      Date.now() - 15 * 60 * 1000,
+    );
+
+    const existingBooking = await Booking.findOne({
+      bike: bikeId,
+      $or: [
+        { status: { $in: ["confirmed", "active"] } },
+        { status: "pending", createdAt: { $gte: pendingBookingCutoff } },
+      ],
+      startDate: { $lt: end },
+      endDate: { $gt: start },
+    });
 
     if (existingBooking) {
       return res.status(400).json({
