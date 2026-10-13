@@ -41,12 +41,22 @@ app.use((error, req, res, next) => {
   next(error);
 });
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get("/", (req, res) => {
   res.json({
     success: true,
     message: "Bike Rental API is running",
   });
 });
+
 app.use("/api/auth", authRoutes);
 app.use("/api/bikes", bikeRoutes);
 app.use("/api/bookings", bookingRoutes);
@@ -67,9 +77,12 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("Server failed to start:", error.message);
+    process.exitCode = 1;
   }
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 export default app;

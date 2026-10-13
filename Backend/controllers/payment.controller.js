@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import razorpay from "../services/payment.service.js";
+import { getRazorpayConfig } from "../services/payment.service.js";
 import Booking from "../models/Booking.js";
 
 // CREATE RAZORPAY ORDER
@@ -55,15 +55,15 @@ export const createPaymentOrder = async (req, res) => {
       receipt: `booking_${booking._id}`,
     };
 
-    const order =
-      await razorpay.orders.create(options);
+    const { razorpay, keyId } = getRazorpayConfig();
+    const order = await razorpay.orders.create(options);
 
     res.status(201).json({
       success: true,
       message: "Payment order created",
       order: {
         ...order,
-        key_id: process.env.RAZORPAY_KEY_ID,
+        key_id: keyId,
       },
       bookingId: booking._id,
       amount: booking.totalAmount,
@@ -123,11 +123,12 @@ export const verifyPayment = async (req, res) => {
       "|" +
       razorpay_payment_id;
 
+    const { keySecret } = getRazorpayConfig();
     const expectedSignature =
       crypto
         .createHmac(
           "sha256",
-          process.env.RAZORPAY_KEY_SECRET
+          keySecret
         )
         .update(body)
         .digest("hex");

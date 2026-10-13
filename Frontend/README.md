@@ -7,6 +7,13 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
+## Vercel deployment
+
+For the frontend deployment, set the Vercel project's Root Directory to `Frontend`.
+Use `npm run build` as the build command and `dist` as the output directory. Set
+`VITE_API_URL` to the deployed backend API URL, including `/api`. The Vercel
+rewrite configuration supports client-side routes such as `/bikes`.
+
 ## React Compiler
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
